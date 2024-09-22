@@ -5,6 +5,10 @@
       {
         "Name": "CRAN",
         "URL": "https://cloud.r-project.org"
+      },
+      {
+        "Name": "IHTM",
+        "URL": "https://oxfordihtm.r-universe.dev"
       }
     ]
   },
@@ -786,7 +790,7 @@
       "Package": "pactr",
       "Version": "0.0.0.9000",
       "Source": "Repository",
-      "Repository": "https://oxfordihtm.r-universe.dev",
+      "Repository": "IHTM",
       "Requirements": [
         "R",
         "countrycode",
