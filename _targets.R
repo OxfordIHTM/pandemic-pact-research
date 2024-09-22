@@ -9,12 +9,16 @@ suppressPackageStartupMessages(source("packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 
 
+## Build options ----
+pact_client <- pact_client_set()
+
+
 ## Create targets and list targets objects ----
 
-### Data ingest and processing targets - Figsahre
+### Data ingest and processing targets - Figsahre ----
 source("_targets_data_figshare.R")
 
-### Data ingest and processing targets - website
+### Data ingest and processing targets - website ----
 source("_targets_data_website.R")
 
 ### Processing targets

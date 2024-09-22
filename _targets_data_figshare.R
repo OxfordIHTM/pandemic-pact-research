@@ -8,10 +8,10 @@
 
 data_figshare_targets <- tar_plan(
   ### Set Figshare client ----
-  tar_target(
-    name = pact_client,
-    command = pact_client_set()
-  ),
+  # tar_target(
+  #   name = pact_client,
+  #   command = pact_client_set()
+  # ),
   ### Read Pandemic PACT data from Figshare ----
   tar_target(
     name = pact_data_figshare,
