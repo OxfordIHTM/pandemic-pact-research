@@ -789,8 +789,14 @@
     "pactr": {
       "Package": "pactr",
       "Version": "0.0.0.9000",
-      "Source": "Repository",
-      "Repository": "IHTM",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "OxfordIHTM",
+      "RemoteRepo": "pactr",
+      "RemoteRef": "main",
+      "RemoteSha": "dcff2dd7caeaa73ade55e5724abaefab9075b3c2",
+      "Remotes": "ropenscilabs/deposits",
       "Requirements": [
         "R",
         "countrycode",
@@ -802,7 +808,7 @@
         "tibble",
         "tidyr"
       ],
-      "Hash": "e91df5b10a07af54e50bb2aa6cce8ab3"
+      "Hash": "348ee60648ffc055ff64378431b37be0"
     },
     "pillar": {
       "Package": "pillar",

@@ -33,6 +33,13 @@ process_website_targets <- tar_plan(
   ### Tabulate disease ----
   tar_target(
     name = pact_disease_table,
-    command = pact_process_disease(pact_data_list_cols)
+    command = pact_table_disease(pact_data_list_cols)
+  ),
+  ### Tabulate research categories ----
+  tar_target(
+    name = pact_category_table,
+    command = pact_table_category(
+      pact_data_list_cols, topic = "ResearchSubcat"
+    )
   )
 )
