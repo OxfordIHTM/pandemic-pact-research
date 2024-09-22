@@ -1,13 +1,9 @@
 name: test targets workflow
 
 on:
-  push:
-    branches: [main, master]
   pull_request:
     branches: [main, master]
   workflow_dispatch:
-    # branches:
-    #   - '*'
 
 jobs:
   test-targets-workflow:
@@ -25,7 +21,7 @@ jobs:
           
       - name: Trust git repo
         run: |
-          git config --global --add safe.directory /__w/ihtm-targets-template/ihtm-targets-template
+          git config --global --add safe.directory /__w/pandemic-pact-research/pandemic-pact-research
           
       - name: Install packages from renv.lock (with cache)
         if: ${{ !env.ACT }}  

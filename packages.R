@@ -1,9 +1,6 @@
-################################################################################
-#
-# Load packages required for standard workflows
-#
-################################################################################
+# Load packages required by project --------------------------------------------
 
+## Load packages for standard analytic workflows ----
 library(targets)
 library(tarchetypes)
 library(here)
@@ -14,3 +11,12 @@ library(dplyr)
 library(tidyr)
 library(openxlsx)
 library(ggplot2)
+
+
+## Load Pandemic PACT-specific package/s ----
+library(pactr)
+
+
+## Load support packages for reporting ----
+library(oxthema)           ## Oxford themes
+

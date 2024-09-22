@@ -11,23 +11,25 @@ knitr::opts_chunk$set(
 )
 ```
 
-# A template R workflow for general data analysis
+# Pandemic PACT Research
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-This repository is a template for a [`docker`](https://www.docker.com/get-started)-containerised, [`{targets}`](https://docs.ropensci.org/targets/)-based, [`{renv}`](https://rstudio.github.io/renv/articles/renv.html)-enabled [`R`](https://cran.r-project.org/) workflow for general data analysis.
+This repository is a [`docker`](https://www.docker.com/get-started)-containerised, [`{targets}`](https://docs.ropensci.org/targets/)-based, [`{renv}`](https://rstudio.github.io/renv/articles/renv.html)-enabled [`R`](https://cran.r-project.org/) workflow for analysing the [Pandemic PACT](https://www.pandemicpact.org/) dataset.
 
 ## About the Project
 
+The [Pandemic PACT](https://www.pandemicpact.org/) monitors and analyses global funding and research evidence related to diseases with pandemic potential, as well as broader research preparedness efforts, and is equipped to pivot in response to outbreaks. It collects, curates, codes, and analyses data in alignment with WHO priority diseases and other selected illnesses, including pandemic influenza, mpox, and plague. Pandemic PACT aims to guide policy and decision-making for research funders, policymakers, researchers, multilateral agencies. The Pandemic PACT data is publicly available for download from its [website](https://www.pandemicpact.org/) and from [Figshare](https://portal.sds.ox.ac.uk/pandemicpact). 
 
+This project utilises the publicly-available Pandemic PACT dataset to perform analytics and research relevant to pandemic preparedness.
 
 ## Repository Structure
 
 The project repository is structured as follows:
 
 ```
-sc-policy-review
+pandemic-pact-research
     |-- .github/
     |-- data/
     |-- data-raw/
@@ -67,5 +69,26 @@ sc-policy-review
 
 ### R package dependencies
 
-This project was built using `R 4.4.1`. This project uses the `renv` framework to record R package dependencies and versions. Packages and versions used are recorded in `renv.lock` and code used to manage dependencies is in `renv/` and other files in the root project directory. On starting an R session in the working directory, run `renv::restore()` to install R package dependencies.
+This project was built using `R 4.4.1`. This project uses the `renv` framework to record R package dependencies and versions. Packages and versions used are recorded in `renv.lock` and code used to manage dependencies is in `renv/` and other files in the root project directory. 
+
+On starting an R session in the working directory, run:
+
+```R
+renv::restore()
+``` 
+
+to install R package dependencies.
+
+### The workflow
+
+```{r pact_workflow, echo = FALSE, message = FALSE, results = 'asis'}
+cat(
+  "```mermaid",
+  targets::tar_mermaid(
+    targets_only = TRUE, color = FALSE, legend = FALSE
+  ),
+  "```",
+  sep = "\n"
+)
+```
 

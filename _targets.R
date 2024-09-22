@@ -1,20 +1,21 @@
 ################################################################################
 #
-# General Targets Workflow
+# Overall workflow
 #
 ################################################################################
 
-## Load libraries and custom functions -----------------------------------------
+## Load libraries and custom functions ----
 suppressPackageStartupMessages(source("packages.R"))
 for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
 
-## Create targets and list targets objects -------------------------------------
 
-### Data targets
-data_targets <- tar_plan(
-  
-)
+## Create targets and list targets objects ----
 
+### Data ingest and processing targets - Figsahre
+source("_targets_data_figshare.R")
+
+### Data ingest and processing targets - website
+source("_targets_data_website.R")
 
 ### Processing targets
 processing_targets <- tar_plan(

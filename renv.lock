@@ -72,6 +72,29 @@
       ],
       "Hash": "f27411eb6d9c3dada5edd444b8416675"
     },
+    "V8": {
+      "Package": "V8",
+      "Version": "5.0.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "Rcpp",
+        "curl",
+        "jsonlite",
+        "utils"
+      ],
+      "Hash": "9eb7b2df315593e726b029200fc0276c"
+    },
+    "askpass": {
+      "Package": "askpass",
+      "Version": "1.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "sys"
+      ],
+      "Hash": "cad6cf7f1d5f6e906700b9d3e718c796"
+    },
     "backports": {
       "Package": "backports",
       "Version": "1.5.0",
@@ -148,6 +171,18 @@
       ],
       "Hash": "d7e13f49c19103ece9e58ad2d83a7354"
     },
+    "checkmate": {
+      "Package": "checkmate",
+      "Version": "2.3.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "backports",
+        "utils"
+      ],
+      "Hash": "0e14e01ce07e7c88fd25de6d4260d26b"
+    },
     "cli": {
       "Package": "cli",
       "Version": "3.6.3",
@@ -183,6 +218,16 @@
       ],
       "Hash": "d954cb1c57e8d8b756165d7ba18aa55a"
     },
+    "countrycode": {
+      "Package": "countrycode",
+      "Version": "1.6.0",
+      "Source": "Repository",
+      "Repository": "https://packagemanager.posit.co/cran/__linux__/jammy/latest",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "08b7058813f13c7a1bb294fea9045e3a"
+    },
     "cpp11": {
       "Package": "cpp11",
       "Version": "0.5.0",
@@ -192,6 +237,16 @@
         "R"
       ],
       "Hash": "91570bba75d0c9d3f1040c835cee8fba"
+    },
+    "curl": {
+      "Package": "curl",
+      "Version": "5.2.2",
+      "Source": "Repository",
+      "Repository": "https://packagemanager.posit.co/cran/latest",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "8f27335f2bcff4d6035edcc82d7d46de"
     },
     "data.table": {
       "Package": "data.table",
@@ -203,6 +258,30 @@
         "methods"
       ],
       "Hash": "fb24e05d4a91d8b1c7ff8e284bde834a"
+    },
+    "deposits": {
+      "Package": "deposits",
+      "Version": "0.2.1.061",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "ropenscilabs",
+      "RemoteRepo": "deposits",
+      "RemoteRef": "main",
+      "RemoteSha": "3495041f03c4d29c58f392cb46e7a621aeece0c6",
+      "Requirements": [
+        "R6",
+        "checkmate",
+        "fs",
+        "here",
+        "httr2",
+        "jsonlite",
+        "jsonvalidate",
+        "methods",
+        "withr",
+        "xml2"
+      ],
+      "Hash": "12aa333f6dbac59f8bd180a8c0a658f6"
     },
     "digest": {
       "Package": "digest",
@@ -287,6 +366,18 @@
       ],
       "Hash": "c2efdd5f0bcd1ea861c2d4e2a883a67d"
     },
+    "forestploter": {
+      "Package": "forestploter",
+      "Version": "1.1.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "grid",
+        "gridExtra",
+        "gtable"
+      ],
+      "Hash": "869e0171f755536dc5ef28ee06c2a4dc"
+    },
     "fs": {
       "Package": "fs",
       "Version": "1.6.4",
@@ -345,6 +436,20 @@
       ],
       "Hash": "e0b3a53876554bd45879e596cdb10a52"
     },
+    "gridExtra": {
+      "Package": "gridExtra",
+      "Version": "2.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "grDevices",
+        "graphics",
+        "grid",
+        "gtable",
+        "utils"
+      ],
+      "Hash": "7d7f283939f563670a697165b2cf5560"
+    },
     "gtable": {
       "Package": "gtable",
       "Version": "0.3.5",
@@ -396,6 +501,27 @@
         "utils"
       ],
       "Hash": "81d371a9cc60640e74e4ab6ac46dcedc"
+    },
+    "httr2": {
+      "Package": "httr2",
+      "Version": "1.0.3",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "R6",
+        "cli",
+        "curl",
+        "glue",
+        "lifecycle",
+        "magrittr",
+        "openssl",
+        "rappdirs",
+        "rlang",
+        "vctrs",
+        "withr"
+      ],
+      "Hash": "10d93e97faad6b629301bb3a2fd23378"
     },
     "igraph": {
       "Package": "igraph",
@@ -450,6 +576,16 @@
         "methods"
       ],
       "Hash": "e1b9c55281c5adc4dd113652d9e26768"
+    },
+    "jsonvalidate": {
+      "Package": "jsonvalidate",
+      "Version": "1.3.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "V8"
+      ],
+      "Hash": "cdc2843ef7f44f157198bb99aea7552d"
     },
     "kableExtra": {
       "Package": "kableExtra",
@@ -604,6 +740,16 @@
       ],
       "Hash": "a623a2239e642806158bc4dc3f51565d"
     },
+    "openssl": {
+      "Package": "openssl",
+      "Version": "2.2.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "askpass"
+      ],
+      "Hash": "c62edf62de70cadf40553e10c739049d"
+    },
     "openxlsx": {
       "Package": "openxlsx",
       "Version": "4.2.7",
@@ -620,6 +766,39 @@
         "zip"
       ],
       "Hash": "4eb6bb5d6b95b2e3177f0dd1e7b9ca0e"
+    },
+    "oxthema": {
+      "Package": "oxthema",
+      "Version": "0.0.0.9000",
+      "Source": "Repository",
+      "Repository": "https://oxfordihtm.r-universe.dev",
+      "Requirements": [
+        "R",
+        "forestploter",
+        "ggplot2",
+        "stringr",
+        "systemfonts",
+        "withr"
+      ],
+      "Hash": "9c27a3430a92bed52bb6786017fed027"
+    },
+    "pactr": {
+      "Package": "pactr",
+      "Version": "0.0.0.9000",
+      "Source": "Repository",
+      "Repository": "https://oxfordihtm.r-universe.dev",
+      "Requirements": [
+        "R",
+        "countrycode",
+        "deposits",
+        "dplyr",
+        "methods",
+        "rlang",
+        "stringr",
+        "tibble",
+        "tidyr"
+      ],
+      "Hash": "e91df5b10a07af54e50bb2aa6cce8ab3"
     },
     "pillar": {
       "Package": "pillar",
@@ -843,6 +1022,13 @@
         "systemfonts"
       ],
       "Hash": "124a41fdfa23e8691cb744c762f10516"
+    },
+    "sys": {
+      "Package": "sys",
+      "Version": "3.4.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "3a1be13d68d47a8cd0bfd74739ca1555"
     },
     "systemfonts": {
       "Package": "systemfonts",

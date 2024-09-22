@@ -1,25 +1,41 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# A template R workflow for general data analysis
+# Pandemic PACT Research
 
 <!-- badges: start -->
 
 <!-- badges: end -->
 
-This repository is a template for a
+This repository is a
 [`docker`](https://www.docker.com/get-started)-containerised,
 [`{targets}`](https://docs.ropensci.org/targets/)-based,
 [`{renv}`](https://rstudio.github.io/renv/articles/renv.html)-enabled
-[`R`](https://cran.r-project.org/) workflow for general data analysis.
+[`R`](https://cran.r-project.org/) workflow for analysing the [Pandemic
+PACT](https://www.pandemicpact.org/) dataset.
 
 ## About the Project
+
+The [Pandemic PACT](https://www.pandemicpact.org/) monitors and analyses
+global funding and research evidence related to diseases with pandemic
+potential, as well as broader research preparedness efforts, and is
+equipped to pivot in response to outbreaks. It collects, curates, codes,
+and analyses data in alignment with WHO priority diseases and other
+selected illnesses, including pandemic influenza, mpox, and plague.
+Pandemic PACT aims to guide policy and decision-making for research
+funders, policymakers, researchers, multilateral agencies. The Pandemic
+PACT data is publicly available for download from its
+[website](https://www.pandemicpact.org/) and from
+[Figshare](https://portal.sds.ox.ac.uk/pandemicpact).
+
+This project utilises the publicly-available Pandemic PACT dataset to
+perform analytics and research relevant to pandemic preparedness.
 
 ## Repository Structure
 
 The project repository is structured as follows:
 
-    sc-policy-review
+    pandemic-pact-research
         |-- .github/
         |-- data/
         |-- data-raw/
@@ -40,15 +56,7 @@ The project repository is structured as follows:
     workflow.
 
   - `data-raw/` contains raw datasets, usually either downloaded from
-    source or added manually, that are used in the project. This
-    directory is empty given that the raw datasets used in this project
-    are restricted and are only distributed to eligible members of the
-    project. This directory is kept here to maintain reproducibility of
-    project directory structure and ensure that the workflow runs as
-    expected. Those who are collaborating on this project and who have
-    permissions to use the raw datasets should include their copies of
-    the raw dataset into this directory in their local versions of this
-    repository.
+    source or added manually, that are used in the project.
 
   - `outputs/` contains compiled reports and figures produced by the
     workflow.
@@ -56,8 +64,8 @@ The project repository is structured as follows:
   - `R/` contains functions developed/created specifically for use in
     this workflow.
 
-  - `reports/` contains literate code for R Markdown reports rendered in
-    the workflow.
+  - `reports/` contains literate code for R Markdown and/or Quarto
+    reports rendered in the workflow.
 
   - `renv/` contains `renv` package specific files and directories used
     by the package for maintaining R package dependencies within the
@@ -86,9 +94,32 @@ The project repository is structured as follows:
 
 ### R package dependencies
 
-This project was built using `R 4.4.0`. This project uses the `renv`
+This project was built using `R 4.4.1`. This project uses the `renv`
 framework to record R package dependencies and versions. Packages and
 versions used are recorded in `renv.lock` and code used to manage
 dependencies is in `renv/` and other files in the root project
-directory. On starting an R session in the working directory, run
-`renv::restore()` to install R package dependencies.
+directory.
+
+On starting an R session in the working directory, run:
+
+``` r
+renv::restore()
+```
+
+to install R package dependencies.
+
+### The workflow
+
+``` mermaid
+graph LR
+  style Graph fill:#FFFFFF00,stroke:#000000;
+  subgraph Graph
+    direction LR
+    xcc1dd80fe3b3ae4f(["pact_data"]):::uptodate --> x425b856cafed2e14(["pact_data_list_cols"]):::uptodate
+    x1942bfb70161773c(["pact_data_download"]):::uptodate --> xcc1dd80fe3b3ae4f(["pact_data"]):::uptodate
+    xd188ac12617431a7(["pact_client"]):::uptodate --> x152e77733f2137bd(["pact_data_figshare"]):::uptodate
+    xd188ac12617431a7(["pact_client"]):::uptodate --> x129fabe77e33db5d(["pact_data_dictionary"]):::uptodate
+    x152e77733f2137bd(["pact_data_figshare"]):::uptodate --> xf4a808aa1c06cf39(["pact_data_figshare_processed"]):::uptodate
+    x425b856cafed2e14(["pact_data_list_cols"]):::uptodate --> x048fedabfb1dc4d1(["pact_disease_table"]):::uptodate
+  end
+```
