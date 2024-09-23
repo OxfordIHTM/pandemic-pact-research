@@ -5,6 +5,12 @@
 
 <!-- badges: start -->
 
+[![License for
+code](https://img.shields.io/badge/license%20\(for%20code\)-GPL3.0-blue.svg)](https://opensource.org/licenses/gpl-3.0.html)
+![License for
+data](https://img.shields.io/badge/license%20\(for%20data\)-CC0-blue)
+[![test targets
+workflow](https://github.com/OxfordIHTM/pandemic-pact-research/actions/workflows/test-targets-workflow.yml/badge.svg)](https://github.com/OxfordIHTM/pandemic-pact-research/actions/workflows/test-targets-workflow.yml)
 <!-- badges: end -->
 
 This repository is a
