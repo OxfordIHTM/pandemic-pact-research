@@ -21,10 +21,8 @@ source("_targets_data_figshare.R")
 ### Data ingest and processing targets - website ----
 source("_targets_data_website.R")
 
-### Processing targets
-processing_targets <- tar_plan(
-  
-)
+### Visualisation targets ----
+source("_targets_visualisation.R")
 
 
 ### Analysis targets
