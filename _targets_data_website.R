@@ -32,6 +32,12 @@ process_website_targets <- tar_plan(
   ),
   ### Tabulate disease ----
   tar_target(
+    name = pact_disease_year_table,
+    command = pact_table_topic_group(
+      pact_data_list_cols, topic = "Disease", group = "GrantStartYear"
+    )
+  ),
+  tar_target(
     name = pact_disease_table,
     command = pact_table_disease(pact_data_list_cols)
   ),
