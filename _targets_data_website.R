@@ -45,6 +45,12 @@ process_website_targets <- tar_plan(
   tar_target(
     name = pact_category_table,
     command = pact_table_category(
+      pact_data_list_cols, topic = "ResearchCat"
+    )
+  ),
+  tar_target(
+    name = pact_subcategory_table,
+    command = pact_table_category(
       pact_data_list_cols, topic = "ResearchSubcat"
     )
   )
