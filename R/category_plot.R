@@ -1,22 +1,16 @@
 #'
-#' Disease bar plot
+#' Plot research categories and subcategories
 #' 
 #' 
 
-plot_disease <- function(pact_disease_table,
-                         outcome = c("frequency", "money")) {
+plot_category <- function(pact_category_table,
+                          outcome = c("frequency", "money")) {
   ## Get outcome ----
   outcome <- match.arg(outcome)
 
-  ## Re-label diseases and re-scale grant amounts ----
-  pact_table <- pact_disease_table |>
-    dplyr::mutate(
-      Disease = factor(
-        x = Disease, levels = disease_list$names, 
-        labels = disease_list$short_names
-      )
-    )
-
+  pact_table <- pact_category_table |>
+    dplyr::filter(ResearchCat != "NA")
+  
   if (outcome == "frequency") {
     ggplot2::ggplot(
       data = pact_table |>
@@ -35,7 +29,9 @@ plot_disease <- function(pact_disease_table,
           )
         ),
       mapping = ggplot2::aes(
-        x = n_grants, y = reorder(Disease, n_grants), fill = grant_type
+        x = n_grants, 
+        y = reorder(stringr::str_wrap(ResearchCat, 35), n_grants), 
+        fill = grant_type
       )
     ) +
       ggplot2::geom_col(alpha = 0.7, position = ggplot2::position_dodge()) +
@@ -45,21 +41,24 @@ plot_disease <- function(pact_disease_table,
       ) +
       ggplot2::scale_x_continuous(
         n.breaks = 12,
-        labels = scales::label_number(scale = 1e-2)
+        labels = scales::label_number(scale = 1e-3)
       ) +
-      ggplot2::labs(x = "Number of Grants (in hundreds)", y = "Disease") +
+      ggplot2::labs(
+        x = "Number of Grants (in thousands)", y = "Research Category"
+      ) +
       oxthema::theme_oxford() +
       ggplot2::theme(
         legend.position = "top",
         panel.border = ggplot2::element_blank(),
-        panel.grid.major.y = ggplot2::element_blank()
+        panel.grid.major.y = ggplot2::element_blank(),
+        axis.text.y = ggplot2::element_text(size = 9)
       )
   } else {
     ggplot2::ggplot(
       data = pact_table,
       mapping = ggplot2::aes(
         x = grant_amount_total, 
-        y = reorder(Disease, grant_amount_total)
+        y = reorder(stringr::str_wrap(ResearchCat, 35), grant_amount_total)
       )
     ) +
       ggplot2::geom_col(
@@ -73,12 +72,13 @@ plot_disease <- function(pact_disease_table,
       ) +
       ggplot2::labs(
         x = "Financial Commitments (in USD 100 millions)", 
-        y = "Disease"
+        y = "Research Category"
       ) +
       oxthema::theme_oxford() +
       ggplot2::theme(
         panel.border = ggplot2::element_blank(),
-        panel.grid.major.y = ggplot2::element_blank()
+        panel.grid.major.y = ggplot2::element_blank(),
+        axis.text.y = ggplot2::element_text(size = 9)
       )
   }
 }

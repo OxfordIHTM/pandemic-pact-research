@@ -27,7 +27,8 @@ plot_disease_year <- function(pact_disease_year_table,
       mapping = ggplot2::aes(x = GrantStartYear, y = n_grants, group = Disease)
     ) +
       ggplot2::geom_line(
-        colour = oxthema::get_oxford_colour("sky"), linewidth = 1
+        colour = oxthema::get_oxford_colour("sky"), linewidth = 0.75,
+        alpha = 0.7
       ) +
       ggplot2::scale_y_continuous(
         breaks = scales::breaks_pretty(),
@@ -41,7 +42,8 @@ plot_disease_year <- function(pact_disease_year_table,
         x = GrantStartYear, y = grant_amount_total, group = Disease)
     ) +
       ggplot2::geom_line(
-        colour = oxthema::get_oxford_colour("sky"), linewidth = 1
+        colour = oxthema::get_oxford_colour("plum"), linewidth = 0.75,
+        alpha = 0.7
       ) +
       ggplot2::scale_y_continuous(
         breaks = scales::breaks_pretty(),
@@ -58,10 +60,10 @@ plot_disease_year <- function(pact_disease_year_table,
     ggplot2::theme_bw() +
     ggplot2::theme(
       strip.background = ggplot2::element_rect(
-        fill = oxthema::get_oxford_colour("sky"), 
+        fill = oxthema::get_oxford_colour("Oxford blue"), 
         colour = oxthema::get_oxford_colour("Oxford blue") 
       ),
-      strip.text = ggplot2::element_text(size = 8),
+      strip.text = ggplot2::element_text(colour = "#FFFFFF", size = 9),
       panel.border = ggplot2::element_blank(),
       panel.grid.minor = ggplot2::element_blank(),
       axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1),
