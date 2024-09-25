@@ -38,9 +38,7 @@ output_targets <- tar_plan(
 
 
 ### Reporting targets
-report_targets <- tar_plan(
-  
-)
+source("_targets_report.R")
 
 
 ### Deploy targets

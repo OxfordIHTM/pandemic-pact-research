@@ -29,5 +29,13 @@ visualisation_targets <- tar_plan(
   tar_target(
     name = category_grant_amount_plot,
     command = plot_category(pact_category_table, outcome = "money")
+  ),
+  tar_target(
+    name = subcategory_grant_number_plot,
+    command = plot_subcategory(pact_subcategory_table)
+  ),
+  tar_target(
+    name = subcategory_grant_amount_plot,
+    command = plot_subcategory(pact_subcategory_table, outcome = "money")
   )
 )

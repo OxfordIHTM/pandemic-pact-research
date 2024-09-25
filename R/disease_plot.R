@@ -63,8 +63,8 @@ plot_disease <- function(pact_disease_table,
       )
     ) +
       ggplot2::geom_col(
-        colour = oxthema::get_oxford_colour("plum"),
-        fill = oxthema::get_oxford_colour("plum"),
+        colour = oxthema::get_oxford_colour("lilac"),
+        fill = oxthema::get_oxford_colour("lilac"),
         alpha = 0.7
       ) +
       ggplot2::scale_x_continuous(
