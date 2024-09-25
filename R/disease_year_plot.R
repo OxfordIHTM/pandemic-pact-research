@@ -27,8 +27,7 @@ plot_disease_year <- function(pact_disease_year_table,
       mapping = ggplot2::aes(x = GrantStartYear, y = n_grants, group = Disease)
     ) +
       ggplot2::geom_line(
-        colour = oxthema::get_oxford_colour("sky"), linewidth = 0.75,
-        alpha = 0.7
+        colour = oxthema::get_oxford_colour("sky"), linewidth = 1
       ) +
       ggplot2::scale_y_continuous(
         breaks = scales::breaks_pretty(),
@@ -42,8 +41,7 @@ plot_disease_year <- function(pact_disease_year_table,
         x = GrantStartYear, y = grant_amount_total, group = Disease)
     ) +
       ggplot2::geom_line(
-        colour = oxthema::get_oxford_colour("plum"), linewidth = 0.75,
-        alpha = 0.7
+        colour = oxthema::get_oxford_colour("lilac"), linewidth = 1
       ) +
       ggplot2::scale_y_continuous(
         breaks = scales::breaks_pretty(),

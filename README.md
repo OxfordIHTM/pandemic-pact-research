@@ -124,13 +124,18 @@ graph LR
     xcc1dd80fe3b3ae4f(["pact_data"]):::uptodate --> x425b856cafed2e14(["pact_data_list_cols"]):::uptodate
     x1942bfb70161773c(["pact_data_download"]):::uptodate --> xcc1dd80fe3b3ae4f(["pact_data"]):::uptodate
     x9cdc471408af7c20(["pact_disease_year_table"]):::uptodate --> x6d53c82f99adf5ab(["disease_year_grant_number_plot"]):::uptodate
+    x4b2eaf5f2a623723(["pact_subcategory_table"]):::uptodate --> x266262b940d59309(["subcategory_grant_amount_plot"]):::uptodate
+    x17238a644d1c9613(["pact_category_table"]):::uptodate --> xbd0d7f2969e060ce(["category_grant_number_plot"]):::uptodate
     x152e77733f2137bd(["pact_data_figshare"]):::uptodate --> xf4a808aa1c06cf39(["pact_data_figshare_processed"]):::uptodate
-    x9cdc471408af7c20(["pact_disease_year_table"]):::uptodate --> xb30b2ab86188f377(["disease_grant_amount_plot"]):::uptodate
+    x048fedabfb1dc4d1(["pact_disease_table"]):::uptodate --> xb30b2ab86188f377(["disease_grant_amount_plot"]):::uptodate
     x425b856cafed2e14(["pact_data_list_cols"]):::uptodate --> x048fedabfb1dc4d1(["pact_disease_table"]):::uptodate
     x425b856cafed2e14(["pact_data_list_cols"]):::uptodate --> x17238a644d1c9613(["pact_category_table"]):::uptodate
+    x4b2eaf5f2a623723(["pact_subcategory_table"]):::uptodate --> xc3ee1024694a8917(["subcategory_grant_number_plot"]):::uptodate
+    x17238a644d1c9613(["pact_category_table"]):::uptodate --> xeebcb2a0add07e8b(["category_grant_amount_plot"]):::uptodate
     x048fedabfb1dc4d1(["pact_disease_table"]):::uptodate --> x861440ba71ebf0a2(["disease_grant_number_plot"]):::uptodate
     x9cdc471408af7c20(["pact_disease_year_table"]):::uptodate --> x2d3474670cc57c2a(["disease_year_grant_amount_plot"]):::uptodate
     x425b856cafed2e14(["pact_data_list_cols"]):::uptodate --> x9cdc471408af7c20(["pact_disease_year_table"]):::uptodate
+    x425b856cafed2e14(["pact_data_list_cols"]):::uptodate --> x4b2eaf5f2a623723(["pact_subcategory_table"]):::uptodate
     x129fabe77e33db5d(["pact_data_dictionary"]):::uptodate --> x129fabe77e33db5d(["pact_data_dictionary"]):::uptodate
   end
 ```

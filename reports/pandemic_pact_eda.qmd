@@ -1,0 +1,108 @@
+---
+title: "Exploratory Data Analysis"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    embed-resources: true
+---
+
+```{r setup}
+#| echo: false
+
+targets::tar_load(
+  c(disease_year_grant_number_plot,
+    disease_year_grant_amount_plot,
+    disease_grant_number_plot,
+    disease_grant_amount_plot,
+    category_grant_number_plot,
+    category_grant_amount_plot,
+    subcategory_grant_number_plot, subcategory_grant_amount_plot
+   ),
+  store = here::here("_targets")
+)
+```
+
+## Grants by disease over time
+
+```{r disease-year-number}
+#| echo: false
+#| warning: false
+#| fig.align: center
+#| fig.width: 10
+#| fig.height: 12
+
+disease_year_grant_number_plot
+```
+
+```{r disease-year-amount}
+#| echo: false
+#| warning: false
+#| fig.align: center
+#| fig.width: 10
+#| fig.height: 12
+
+disease_year_grant_amount_plot
+```
+
+## Grants by disease
+
+```{r grants-number}
+#| echo: false
+#| warning: false
+#| fig.align: center
+#| fig.height: 10
+
+disease_grant_number_plot
+```
+
+```{r grants-amount}
+#| echo: false
+#| warning: false
+#| fig.align: center
+#| fig.height: 10
+
+disease_grant_amount_plot
+```
+
+## Research categories
+
+```{r category-grant-number}
+#| echo: false
+#| warning: false
+#| fig.height: 10
+#| fig.align: center
+
+category_grant_number_plot
+```
+
+```{r category-grant-amount}
+#| echo: false
+#| warning: false
+#| fig.height: 10
+#| fig.align: center
+
+category_grant_amount_plot
+```
+
+## Research subcategories
+
+```{r subcategory-grant-number}
+#| echo: false
+#| warning: false
+#| fig.height: 50
+#| fig.weight: 15
+#| fig.align: center
+
+subcategory_grant_number_plot
+```
+
+```{r subcategory-grant-amount}
+#| echo: false
+#| warning: false
+#| fig.height: 50
+#| fig.weight: 15
+#| fig.align: center
+
+subcategory_grant_amount_plot
+```
