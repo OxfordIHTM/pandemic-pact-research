@@ -927,6 +927,13 @@ Influenza A values grouped by Orthomyxoviridae response to pathogen
 pact_data |>
   dplyr::mutate(Disease = stringr::str_split(Disease, " \\| ")) |>
   tidyr::unnest(Disease) |>
+  dplyr::mutate(
+    Disease = factor(
+      x = Disease,
+      levels = disease_list$names,
+      labels = disease_list$short_names
+    )
+  ) |>
   dplyr::count(Disease) |>
   ggplot(mapping = aes(x = n, y = reorder(Disease, n))) +
   geom_col(
