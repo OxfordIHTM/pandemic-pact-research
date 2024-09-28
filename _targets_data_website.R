@@ -15,6 +15,12 @@ data_website_targets <- tar_plan(
     ),
     format = "file"
   ),
+  ### Archive downloaded dataset ----
+  tar_target(
+    name = pact_data_archive,
+    command = archive_website_data(path_from = pact_data_download),
+    format = "file"
+  ),
   ### Read Pandemic PACT data from download ----
   tar_target(
     name = pact_data,
