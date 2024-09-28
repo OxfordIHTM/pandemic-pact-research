@@ -20,4 +20,4 @@ library(pactr)
 
 ## Load support packages for reporting ----
 library(oxthema)           ## Oxford themes
-
+library(DT)                ## interactive data tables

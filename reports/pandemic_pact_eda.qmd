@@ -1,5 +1,19 @@
 ---
-title: "Exploratory Data Analysis"
+title: Exploratory Data Analysis
+subtitle: Pandemic PACT Funding Tracker Dataset
+author:
+  - name: Ernest Guevarra
+    orcid: 0000-0002-4887-4415
+    email: ernest.guevarra@ndm.ox.ac.uk
+    affiliation: 
+      - name: University of Oxford
+        city: Oxford
+  - name: Proochista Ariana
+    email: proochista.ariana@ndm.ox.ac.uk
+    affiliation:
+      - name: University of Oxford
+        city: Oxford
+date: "`r format(Sys.Date(), '%d %B %Y')`"
 format: 
   html:
     toc: true
@@ -11,15 +25,14 @@ format:
 #| echo: false
 
 targets::tar_load(
-  c(disease_year_grant_number_plot,
-    disease_year_grant_amount_plot,
-    disease_grant_number_plot,
-    disease_grant_amount_plot,
-    category_grant_number_plot,
-    category_grant_amount_plot,
-    subcategory_grant_number_plot, subcategory_grant_amount_plot
-   ),
-  store = here::here("_targets")
+  c(disease_year_grant_number_plot, disease_year_grant_amount_plot,
+    disease_grant_number_plot, disease_grant_amount_plot,
+    category_grant_number_plot, category_grant_amount_plot,
+    subcategory_grant_number_plot, subcategory_grant_amount_plot,
+    pact_region_funder_table, pact_country_funder_table,
+    pact_region_institution_table, pact_country_institution_table,
+    pact_region_research_table, pact_country_research_table
+   )
 )
 ```
 
@@ -29,7 +42,7 @@ targets::tar_load(
 #| echo: false
 #| warning: false
 #| fig.align: center
-#| fig.width: 10
+#| fig.width: 12
 #| fig.height: 12
 
 disease_year_grant_number_plot
@@ -39,7 +52,7 @@ disease_year_grant_number_plot
 #| echo: false
 #| warning: false
 #| fig.align: center
-#| fig.width: 10
+#| fig.width: 12
 #| fig.height: 12
 
 disease_year_grant_amount_plot
@@ -47,20 +60,22 @@ disease_year_grant_amount_plot
 
 ## Grants by disease
 
-```{r grants-number}
+```{r disease-number}
 #| echo: false
 #| warning: false
 #| fig.align: center
-#| fig.height: 10
+#| fig.width: 10
+#| fig.height: 8
 
 disease_grant_number_plot
 ```
 
-```{r grants-amount}
+```{r disease-amount}
 #| echo: false
 #| warning: false
 #| fig.align: center
-#| fig.height: 10
+#| fig.width: 10
+#| fig.height: 8
 
 disease_grant_amount_plot
 ```
@@ -106,3 +121,9 @@ subcategory_grant_number_plot
 
 subcategory_grant_amount_plot
 ```
+
+## Grants by location
+
+### Grants by funder region
+
+There seems to be a discrepancy between the

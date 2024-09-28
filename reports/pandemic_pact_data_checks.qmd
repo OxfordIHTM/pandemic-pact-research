@@ -1,0 +1,1639 @@
+---
+title: Data Checks
+subtitle: Pandemic PACT Funding Tracker Dataset
+author:
+  - name: Proochista Ariana
+    orcid: 0000-0002-0154-2237
+    email: proochista.ariana@ndm.ox.ac.uk
+    affiliation:
+      - name: Centre for Tropical Medicine and Global Health, Nuffield Department of Medicine, University of Oxford
+        city: Oxford
+  - name: Ernest Guevarra
+    orcid: 0000-0002-4887-4415
+    email: ernest.guevarra@ndm.ox.ac.uk
+    affiliation: 
+      - name: Centre for Tropical Medicine and Global Health, Nuffield Department of Medicine, University of Oxford
+        city: Oxford
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    embed-resources: true
+    grid:
+      body-width: 900px
+      margin-width: 300px
+    code-tools:
+      source: https://github.com/OxfordIHTM/pandemic-pact-research/blob/main/reports/pandemic_pact_data_checks.qmd
+---
+
+```{r setup}
+#| echo: false
+
+suppressPackageStartupMessages(source(here::here("packages.R")))
+for (f in list.files(here::here("R"), full.names = TRUE)) source (f)
+
+targets::tar_load(
+  c(pact_data, pact_data_list_cols,
+    pact_disease_year_table, pact_disease_table, pact_category_table, pact_subcategory_table, pact_region_funder_table, pact_country_funder_table, pact_region_institution_table, pact_country_institution_table, pact_region_research_table, pact_country_research_table,
+    disease_year_grant_number_plot, disease_year_grant_amount_plot,
+    disease_grant_number_plot, disease_grant_amount_plot,
+    category_grant_number_plot, category_grant_amount_plot,
+    subcategory_grant_number_plot, subcategory_grant_amount_plot
+   )
+)
+```
+
+## Summary
+
+We found the following issues in the dataset downloaded from the Pandemic PACT website.
+
+::: {.callout-important title="Critical issues"}
+1. Incorrect WHO funder regions to match the recorded funder countries in 1 record (see @sec-funder-location for a discussion on this issues; see @tbl-funder-incorrect-region for details on the record with issues)
+
+2. Incorrect WHO research institution regions to match the recorded research institution countries in 433 records (see @sec-institution-location for a discussion on this issue; see @tbl-institution-location-check-1 and @tbl-institution-incorrect-region for details on the records with issues)
+
+3. Incorrect WHO research location regions to match the recorded research location countries in 10 records (see @sec-research-location for a discussion on this issue; see @tbl-research-location-check-1 and @tbl-research-incorrect-region for details on the records with issues)
+:::
+
+::: {.callout-warning title="Consider addressing"}
+4. One-to-one correspondence between fields/variables that are linked to each other (e.g., country and region, category and subcategory, priority and subpriority) is inconsistent particularly on records with multiple responses/values.
+
+5. Confusing and often incoherent use of `"Not applicable"`, `"Unspecified"`, `"N/A"`, and `""` throughout the dataset.
+:::
+
+## Introduction {#sec-introduction}
+
+This document reports on basic data checks performed on the Pandemic PACT tracker dataset available from its [website](https://www.pandemicpact.org). Each section of the document is an assessment for each field/variable found in the downloaded dataset from the website. We used the available functions in the [`{pactr}`](https://oxford-ihtm.io/pactr) package to read and check the dataset.
+
+```{r read-pact-data}
+## Read dataset from website ----
+pact_data <- pact_read_website()
+```
+
+### Purpose
+
+The purpose of this report is to document the structure, form, and details of the dataset available from the Pandemic PACT website and note challenges and issues from a data handling and wrangling perspective and also possible errors. This report is aimed at those wanting to directly work with the downloadable dataset from the Pandemic PACT website and perform their own exploratory analysis and/or use the dataset for their respective research as a guide to handling the data in an analysis platform or software. 
+
+### Reproducibility
+This review was conducted using [R](https://r-project.org) language for statistical computing and graphics. Literate code that produced this report can be found by clicking on the code icon on the upper right corner of this document. Reproducible code of the scientific workflow that produced this report can be found [here](https://github.com/OxfordIHTM/pandemic-pact-research). For full reproducibility, please use and follow the instructions in this [repository](https://github.com/OxfordIHTM/pandemic-pact-research) for the scientific workflow.
+
+This report uses data from the Pandemic PACT website downloaded on the day of report publication shown above.
+
+## Data checks {#sec-data-checks}
+
+### GrantID {#sec-grant-id}
+
+::: {.callout-note}
+* **`r table(is.na(pact_data$GrantID)) |> (\(x) x[2])()`** NAs/missing values
+
+* **`r table(duplicated(pact_data$GrantID)) |> (\(x) x[2])()`** duplicated values
+:::
+
+### PubMedGrantId {#sec-pubmed-id}
+
+::: {.callout-note}
+* a grant may have more than one PubMedGrantId and the different values for pubmed ID are separated by a ***comma*** or a ***space***
+
+* **`r table(stringr::str_detect(pact_data$PubMedGrantId, ",")) |> (\(x) x[2])()`** records had a ***comma*** separator
+
+* **`r table(stringr::str_detect(pact_data$PubMedGrantId, " ")) |> (\(x) x[2])()`** records had a ***space*** separator
+
+* **`r table(is.na(pact_data$PubMedGrantId)) |> (\(x) x[2])()`** NA values...
+
+* ...but there are **`r table(pact_data$PubMedGrantId == "") |> (\(x) x[2])()`** records with empty value ("") - should these be NAs?
+
+* there are **`r table(stringr::str_detect(pact_data$PubMedGrantId, pattern = "\\+")) |> (\(x) x[2])()`** pub med grant ids that have been converted to exponential format - might be due to conversion during processing especially if Excel spreadsheet was used for processing
+:::
+
+### GrantTitleEng {#sec-grant-title}
+
+::: {.callout-note}
+* **`r table(is.na(pact_data$GrantTitleEng)) |> (\(x) x[2])()`** NA values
+
+* **`r table(pact_data$GrantTitleEng == "") |> (\(x) x[2])()`** empty values
+
+* no obvious issues noted
+:::
+     
+### Abstract {#sec-abstract}
+
+::: {.callout-note}
+* **`r table(is.na(pact_data$Abstract)) |> (\(x) x[2])()`** records with NA values...
+
+* ... and **`r table(pact_data$Abstract == "") |> (\(x) x[2])()`** more records with empty (`""`) values - should these just be treated as NAs?
+:::
+
+### PublicationYearOfAward {#sec-publication-year}
+
+```{r pubyear-summary-plot}
+#| echo: false
+#| warning: false
+#| column: margin
+#| label: fig-pubyear
+#| fig-cap: Distribution of grant publication year values
+pact_data |>
+  dplyr::count(PublicationYearOfAward) |>
+  dplyr::mutate(
+    PublicationYearOfAward = as.character(PublicationYearOfAward)
+  ) |>
+  ggplot(mapping = aes(x = PublicationYearOfAward, y = n)) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  scale_y_continuous(breaks = scales::breaks_pretty()) +
+  labs(x = "Year of Publication Award", y = "Number of Grants") +
+  theme_oxford(grid = "Yy") +
+  theme(
+    axis.text.x = ggplot2::element_text(
+      size = 9, angle = 90, vjust = 0.5, hjust = 1
+    )
+  )
+```
+
+```{r pubyear-summary-a}
+#| eval: false
+pact_data |> dplyr::count(PublicationYearOfAward)
+```
+
+&nbsp;
+
+::: {#tbl-pubyear-summary}
+```{r pubyear-summary-b}
+#| echo: false
+
+pact_pubyear_table <- pact_data |> dplyr::count(PublicationYearOfAward)
+
+DT::datatable(
+  pact_pubyear_table, rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Grant publication year values
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* there are **`r check_value_na(pact_pubyear_table)`** NA values;
+
+* there are **`r check_value_empty(pact_pubyear_table)`** empty (`""`) values;
+
+* there are **`r check_value_detect(pact_pubyear_table, "-99")`** `-99` values; should these be recoded to NA?
+:::
+ 
+### GrantEndYear {#sec-grant-end-year}
+
+```{r grantend-summary-plot}
+#| echo: false
+#| warning: false
+#| column: margin
+#| label: fig-grant-end-year
+#| fig-cap: Distribution of grant end year values
+pact_data |>
+  dplyr::count(GrantEndYear) |>
+  dplyr::mutate(GrantEndYear = as.character(GrantEndYear)) |>
+  ggplot(mapping = aes(x = GrantEndYear, y = n)) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  scale_y_continuous(breaks = scales::breaks_pretty()) +
+  labs(x = "Grant End Year", y = "Number of Grants") +
+  theme_oxford(grid = "Yy") +
+  theme(
+    axis.text.x = ggplot2::element_text(
+      size = 9, angle = 90, vjust = 0.5, hjust = 1
+    )
+  )
+```
+
+```{r grantend-summary-a}
+#| eval: false
+pact_data |> dplyr::count(GrantEndYear)
+```
+
+&nbsp;
+
+::: {#tbl-grant-end-summary align="center"}
+```{r grantend-summary-b}
+#| echo: false
+pact_endyear_table <- pact_data |> dplyr::count(GrantEndYear)
+
+DT::datatable(
+  pact_endyear_table, rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Grant end year values
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* there are **`r check_value_na(pact_endyear_table)`** NA values;
+
+* there are **`r check_value_empty(pact_endyear_table)`** empty ("") values;
+
+* there are **`r check_value_detect(pact_endyear_table, "-99")`** `-99` values; should these be recoded to NA?
+:::
+
+### ResearchInstitutionName {#sec-research-institution}
+
+```{r institution-name-summary-a}
+#| eval: false
+pact_data |> dplyr::count(ResearchInstitutionName)
+```
+
+&nbsp;
+
+::: {#tbl-institution-name}
+```{r institution-name-summary-b}
+#| echo: false
+pact_institution_table <- pact_data |> dplyr::count(ResearchInstitutionName)
+
+DT::datatable(pact_institution_table, rownames = FALSE)
+```
+
+Names of research institutions
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* there are **`r check_value_na(pact_institution_table)`** NA values;
+
+* there are **`r check_value_detect(pact_institution_table, "N/A")`** `"N/A"` values - should these be recoded to NA?
+:::
+
+### GrantAmountConverted {#sec-grant-amount}
+
+```{r grant-amount-boxplot-1}
+#| echo: false
+#| warning: false
+#| column: margin
+#| label: fig-grant-boxplot-1
+#| fig.cap: Distribution of grant amounts - full range
+ggplot(pact_data, mapping = aes(y = GrantAmountConverted)) +
+  geom_boxplot(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7,
+    outlier.shape = 21, 
+    outlier.colour = get_oxford_colour("sky"),
+    outlier.fill = get_oxford_colour("sky"),
+    outlier.alpha = 0.7,
+    na.rm = TRUE
+  ) +
+  scale_x_discrete() +
+  scale_y_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-6)
+  ) +
+  labs(y = "Grant Amount (in USD millions)") +
+  coord_flip() +
+  theme_oxford()
+```
+
+```{r grant-amount-boxplot-2}
+#| echo: false
+#| warning: false
+#| column: margin
+#| label: fig-grant-boxplot-2
+#| fig.cap: Distribution of grant amounts - without outliers
+ggplot(pact_data, mapping = aes(y = GrantAmountConverted)) +
+  geom_boxplot(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7,
+    outliers = FALSE,
+    na.rm = TRUE
+  ) +
+  scale_x_discrete() +
+  scale_y_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-6)
+  ) +
+  labs(y = "Grant Amount (in USD millions)") +
+  coord_flip() +
+  theme_oxford()
+```
+
+::: {.callout-note}
+* there are **`r table(is.na(pact_data$GrantAmountConverted)) |> (\(x) x[2])()`** NA values
+:::
+
+### StudySubject {#sec-study-subject}
+
+```{r study-subject-summary-a}
+#| eval: false
+pact_data |> dplyr::count(StudySubject)
+```
+
+&nbsp;
+
+::: {#tbl-study-subject}
+```{r study-subject-summary-b}
+#| echo: false
+pact_studysubject_table <- pact_data |> dplyr::count(StudySubject)
+
+DT::datatable(
+  pact_studysubject_table, rownames = FALSE,
+  options = list(paging = FALSE)
+)
+```
+
+Study subject values
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* a grant may have more than one StudySubject value; different values are separated by a `" | "`; there are **`r table(stringr::str_detect(pact_data$StudySubject, " \\| ")) |> (\(x) x[2])()`** records with more than one StudySubject values
+
+* there are **`r check_value_na(pact_studysubject_table)`** NA values;
+
+* there are **`r check_value_empty(pact_studysubject_table)`** empty (`""`) values;
+
+* there are **`r check_value_detect(pact_studysubject_table, "Not applicable")`** values of StudySubject that contain "Not applicable" of which **`r check_value_detect(pact_studysubject_table, " Not applicable|Not applicable ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have an StudySubject value and then also be not applicable? If we take not applicable as NA, this will not matter but it is an incoherent record for this variable.
+:::
+
+### Ethnicity {#sec-ethnicity}
+
+```{r ethnicity-summary-plot}
+#| echo: false
+#| warning: false
+#| column: margin
+#| label: fig-ethnicity
+#| fig-cap: Distribution of ethnicity values
+pact_data |>
+  dplyr::mutate(Ethnicity = stringr::str_split(Ethnicity, " \\| ")) |>
+  tidyr::unnest(Ethnicity) |>
+  dplyr::count(Ethnicity) |>
+  ggplot(mapping = aes(x = n, y = reorder(Ethnicity, n))) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(x = "Number of Grants (in thousands)", y = "Ethnicity") +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx")
+```
+
+```{r ethnicity-values-table-a}
+#| eval: false
+pact_data |> dplyr::count(Ethnicity)
+```
+
+&nbsp;
+
+::: {#tbl-ethnicity}
+```{r ethnicity-values-table-b}
+#| echo: false
+pact_ethnicity_table <- pact_data |> dplyr::count(Ethnicity) 
+
+pact_ethnicity_table |> 
+  DT::datatable(rownames = FALSE, options = list(paging = FALSE))
+```
+
+Ethnicity values
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* a grant may have more than one Ethnicity value; different values are separated by a `" | "`; there are **`r table(stringr::str_detect(pact_data$Ethnicity, " \\| ")) |> (\(x) x[2])()`** records with more then one value for Ethnicity
+
+* there are **`r check_value_na(pact_ethnicity_table)`** NA values
+
+* there are **`r check_value_empty(pact_ethnicity_table)`** empty (`""`) values
+
+* there are **`r check_value_detect(pact_ethnicity_table, "Not applicable")`** values of Ethnicity that contain "Not applicable" of which **`r check_value_detect(pact_ethnicity_table, " Not applicable|Not applicable ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have an Ethnicity value and then also be not applicable? If we take not applicable as NA, this will not matter but it is an incoherent record for this variable.
+
+* there are **`r check_value_detect(pact_ethnicity_table, "Unspecified")`** values of Ethnicity that contain "Unspecified" of which **`r check_value_detect(pact_ethnicity_table, " Unspecified|Unspecified ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have an AgeGroup value and then also be unspecified?
+:::
+
+### AgeGroups {#sec-age-groups}
+
+```{r agegroups-summary-plot}
+#| echo: false
+#| warning: false
+#| column: margin
+#| label: fig-agegroups
+#| fig-cap: Distribution of age group values
+pact_data |>
+  dplyr::mutate(AgeGroups = stringr::str_split(AgeGroups, " \\| ")) |>
+  tidyr::unnest(AgeGroups) |>
+  dplyr::count(AgeGroups) |>
+  ggplot(mapping = aes(x = n, y = reorder(AgeGroups, n))) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(x = "Number of Grants (in thousands)", y = "Age Groups") +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx")
+```
+
+```{r age-groups-summary-a}
+#| eval: false
+pact_data |> dplyr::count(AgeGroups)
+```
+
+&nbsp;
+
+::: {#tbl-age-groups}
+```{r age-groups-summary-b}
+#| echo: false
+pact_agegroup_table <- pact_data |> dplyr::count(AgeGroups)
+
+DT::datatable(
+  pact_agegroup_table, rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Age group values
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* a grant may have more than one AgeGroups value; different values are separated by a `" | "`; there are **`r table(stringr::str_detect(pact_data$AgeGroups, " \\| ")) |> (\(x) x[2])()`** records with more than one AgeGroups value
+
+* there are **`r check_value_na(pact_agegroup_table)`** NA values;
+
+* there are **`r check_value_empty(pact_agegroup_table)`** empty (`""`) values;
+
+* there are **`r check_value_detect(pact_agegroup_table, "Not Applicable")`** values of AgeGroup that contain "Not applicable" of which **`r check_value_detect(pact_agegroup_table, " Not Applicable|Not Applicable ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have an AgeGroup value and then also be not applicable? If we take not applicable as NA, this will not matter but it is an incoherent record for this variable.
+
+* note also that for this field/variable, "Not Applicable" is spelled with a capital `A` as compared to small letter `a` for "Not applicable" in other fields/variables.
+
+* there are **`r check_value_detect(pact_agegroup_table, "Unspecified")`** values of AgeGroup that contain "Unspecified" of which **`r check_value_detect(pact_agegroup_table, " Unspecified|Unspecified ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have an AgeGroup value and then also be unspecified?
+:::
+
+### Rurality {#sec-rural}
+
+```{r rural-summary-plot}
+#| echo: false
+#| warning: false
+#| column: margin
+#| label: fig-rural
+#| fig-cap: Distribution of rurality values
+pact_data |>
+  dplyr::mutate(Rurality = stringr::str_split(Rurality, " \\| ")) |>
+  tidyr::unnest(Rurality) |>
+  dplyr::count(Rurality) |>
+  ggplot(mapping = aes(x = n, y = reorder(Rurality, n))) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(x = "Number of Grants (in thousands)", y = "Rurality") +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx")
+```
+
+```{r rural-summary-a}
+#| eval: false
+pact_data |> dplyr::count(Rurality)
+```
+
+&nbsp;
+
+::: {#tbl-rural}
+```{r rural-summary-b}
+#| echo: false
+pact_rural_table <- pact_data |> dplyr::count(Rurality)
+
+DT::datatable(
+  pact_rural_table, rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Rurality values
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* a grant may have more than one Rurality value; different values are separated by a `" | "`; there are **`r table(stringr::str_detect(pact_data$Rurality, " \\| ")) |> (\(x) x[2])()`** records with more than one Rurality value
+
+* there are **`r check_value_na(pact_rural_table)`** NA values;
+
+* there are **`r check_value_empty(pact_rural_table)`** empty (`""`) values;
+
+* there are **`r check_value_detect(pact_rural_table, "Not applicable")`** values of Rurality that contain "Not applicable" of which **`r check_value_detect(pact_rural_table, " Not applicable|Not applicable ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have an Rurality value and then also be not applicable? If we take not applicable as NA, this will not matter but it is an incoherent record for this variable.
+
+* there are **`r check_value_detect(pact_rural_table, "Unspecified")`** values of Rurality that contain "Unspecified" of which **`r check_value_detect(pact_rural_table, " Unspecified|Unspecified ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have a Rurality value and then also be unspecified?
+:::
+
+### VulnerablePopulations {#sec-vulnerable-populations}
+
+```{r vulnerable-summary-plot}
+#| echo: false
+#| warning: false
+#| column: margin
+#| label: fig-vulnerable
+#| fig-cap: Distribution of vulnerable populations values
+pact_data |>
+  dplyr::mutate(
+    VulnerablePopulations = stringr::str_split(
+      VulnerablePopulations, " \\| "
+    )
+  ) |>
+  tidyr::unnest(VulnerablePopulations) |>
+  dplyr::count(VulnerablePopulations) |>
+  ggplot(mapping = aes(x = n, y = reorder(VulnerablePopulations, n))) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(x = "Number of Grants (in thousands)", y = "Vulnerable Populations") +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx") +
+  theme(axis.text.y = element_text(size = 9))
+```
+
+```{r vulnerable-summary-a}
+#| eval: false
+pact_data |> dplyr::count(VulnerablePopulations)
+```
+
+&nbsp;
+
+::: {#tbl-vulnerable}
+```{r vulnerable-summary-b}
+#| echo: false
+pact_vulnerable_table <- pact_data |> dplyr::count(VulnerablePopulations)
+
+DT::datatable(
+  pact_vulnerable_table, rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Vulnerable populations values
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* a grant may have more than one VulnerablePopulations value; different values are separated by a `" | "`; there are **`r table(stringr::str_detect(pact_data$VulnerablePopulations, " \\| ")) |> (\(x) x[2])()`** records with more than one VulnerablePopulations value;
+
+* there are **`r check_value_na(pact_vulnerable_table)`** NA values;
+
+* there are **`r check_value_empty(pact_vulnerable_table)`** empty (`""`) values;
+
+* there are **`r check_value_detect(pact_vulnerable_table, "Not applicable")`** values of VulnerablePopulations that contain "Not applicable" of which **`r check_value_detect(pact_vulnerable_table, " Not applicable|Not applicable ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have an VulnerablePopulations value and then also be not applicable? If we take not applicable as NA, this will not matter but it is an incoherent record for this variable.
+
+* there are **`r check_value_detect(pact_vulnerable_table, "Unspecified")`** values of VulnerablePopulations that contain "Unspecified" of which **`r check_value_detect(pact_vulnerable_table, " Unspecified|Unspecified ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have an VulnerablePopulations value and then also be unspecified?
+:::
+
+### OccupationalGroups {#sec-occupational-groups}
+
+```{r occupation-summary-plot}
+#| echo: false
+#| warning: false
+#| column: margin
+#| label: fig-occupation
+#| fig-cap: Distribution of occupational groups values
+pact_data |>
+  dplyr::mutate(
+    OccupationalGroups = stringr::str_split(
+      OccupationalGroups, " \\| "
+    )
+  ) |>
+  tidyr::unnest(OccupationalGroups) |>
+  dplyr::count(OccupationalGroups) |>
+  ggplot(mapping = aes(x = n, y = reorder(OccupationalGroups, n))) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(x = "Number of Grants (in thousands)", y = "Occupational Groups") +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx") +
+  theme(axis.text.y = element_text(size = 9))
+```
+
+```{r occupation-summary-a}
+#| eval: false
+pact_data |> dplyr::count(OccupationalGroups)
+```
+
+&nbsp;
+
+::: {#tbl-occupation}
+```{r occupation-summary-b}
+#| echo: false
+pact_occupation_table <- pact_data |> dplyr::count(OccupationalGroups)
+
+DT::datatable(
+  pact_occupation_table, rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Occupational groups values
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* a grant may have more than one OccupationalGroups value; different values are separated by a `" | "`; there are **`r table(stringr::str_detect(pact_data$OccupationalGroups, " \\| ")) |> (\(x) x[2])()`** records with more than one OccupationalGroups value;
+
+* there are **`r check_value_na(pact_occupation_table)`** NA values;
+
+* there are **`r check_value_empty(pact_occupation_table)`** empty (`""`) values;
+
+* there are **`r check_value_detect(pact_occupation_table, "Not applicable")`** values of OccupationalGroups that contain "Not applicable" of which **`r check_value_detect(pact_occupation_table, " Not applicable|Not applicable ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have an OccupationalGroups value and then also be not applicable? If we take not applicable as NA, this will not matter but it is an incoherent record for this variable.
+
+* there are **`r check_value_detect(pact_occupation_table, "Unspecified")`** values of OccupationalGroups that contain "Unspecified" of which **`r check_value_detect(pact_occupation_table, " Unspecified|Unspecified ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have an OccupationalGroups value and then also be unspecified?
+:::
+
+### StudyType {#sec-study-type}
+
+```{r studytype-summary-plot}
+#| echo: false
+#| warning: false
+#| column: margin
+#| label: fig-study-type
+#| fig-cap: Distribution of study type values
+pact_data |>
+  dplyr::mutate(StudyType = stringr::str_split(StudyType, " \\| ")) |>
+  tidyr::unnest(StudyType) |>
+  dplyr::count(StudyType) |>
+  ggplot(mapping = aes(x = n, y = reorder(StudyType, n))) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(x = "Number of Grants (in thousands)", y = "Study Type") +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx")
+```
+
+```{r study-type-summary-a}
+#| eval: false
+pact_data |> dplyr::count(StudyType)
+```
+
+&nbsp;
+
+::: {#tbl-study-type}
+```{r study-type-summary-b}
+#| echo: false
+pact_studytype_table <- pact_data |> dplyr::count(StudyType)
+
+DT::datatable(
+  pact_studytype_table, rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Study type values
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* a grant may have more than one StudyType value; different values are separated by a `" | "`; there are **`r table(stringr::str_detect(pact_data$StudyType, " \\| ")) |> (\(x) x[2])()`** records with more than one StudyType value;
+
+* there are **`r check_value_na(pact_studytype_table)`** NA values;
+
+* there are **`r check_value_empty(pact_studytype_table)`** empty (`""`) values;
+
+* there are **`r check_value_detect(pact_studytype_table, "Not applicable")`** values of StudyType that contain "Not applicable" of which **`r check_value_detect(pact_studytype_table, " Not applicable|Not applicable ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have a StudyType value and then also be not applicable? If we take not applicable as NA, this will not matter but it is an incoherent record for this variable.
+
+* there are **`r check_value_detect(pact_studytype_table, "Unspecified")`** values of StudyType that contain "Unspecified" of which **`r check_value_detect(pact_studytype_table, " Unspecified|Unspecified ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have a StudyType value and then also be unspecified?
+:::
+
+### ClinicalTrial {#sec-clinical-trial}
+
+* it would seem that this variable will only have a value if StudyType has "Clinical" as a response. To check this:
+
+```{r clinical-trial-check-summary-a}
+#| eval: false
+pact_data |>
+  dplyr::mutate(
+    StudyTypeX = stringr::str_replace_all(
+      StudyType, pattern = "Non-Clinical", replacement = "Non-clinical"
+    ),
+    grouping = stringr::str_detect(StudyTypeX, pattern = "Clinical")
+  ) |>
+  dplyr::group_by(grouping) |>
+  dplyr::count(ClinicalTrial)
+```
+
+&nbsp;
+
+::: {#tbl-clinical-trial}
+```{r clinical-trial-check-summary-b}
+#| echo: false
+pact_clinicaltrial_table <- pact_data |>
+    dplyr::mutate(
+    StudyTypeX = stringr::str_replace_all(
+      StudyType, pattern = "Non-Clinical", replacement = "Non-clinical"
+    ),
+    grouping = stringr::str_detect(StudyTypeX, pattern = "Clinical")
+  ) |>
+  dplyr::group_by(grouping) |>
+  dplyr::count(ClinicalTrial) |>
+  dplyr::ungroup()
+
+DT::datatable(
+  pact_clinicaltrial_table, rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Clinical trial values grouped by study type values
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* there are **`r check_value_na(pact_clinicaltrial_table |> dplyr::filter(grouping) |> dplyr::select(ClinicalTrial, n))`** NA values for records that are indicated as "Clinical" in StudyType;
+
+* there are **`r check_value_empty(pact_clinicaltrial_table |> dplyr::filter(grouping) |> dplyr::select(ClinicalTrial, n))`** empty (`""`) values for records that are indicated as "Clinical" in StudyType;
+
+* for records that are indicated as "Clinical" in StudyType, there are **`r check_value_detect(pact_clinicaltrial_table |> dplyr::filter(grouping) |> dplyr::select(ClinicalTrial, n), "Not applicable")`** values of ClinicalTrial that contain "Not applicable" of which **`r check_value_detect(pact_clinicaltrial_table |> dplyr::filter(grouping) |> dplyr::select(ClinicalTrial, n), " Not applicable|Not applicable ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have a ClinicalTrial value and then also be not applicable?
+
+* for records that are indicated as "Clinical" in StudyType, there are **`r check_value_detect(pact_clinicaltrial_table |> dplyr::filter(grouping) |> dplyr::select(ClinicalTrial, n), "Unspecified")`** values of ClinicalTrial that contain "Unspecified" of which **`r check_value_detect(pact_clinicaltrial_table |> dplyr::filter(grouping) |> dplyr::select(ClinicalTrial, n), " Unspecified|Unspecified ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have a ClinicalTrial value and then also be unspecified?
+
+* for records that are indicated as "Non-Clinical", they have ClinicalTrial values of **`r check_value_combo(pact_clinicaltrial_table)`**
+:::
+    
+### Pathogen {#sec-pathogen}
+
+```{r pathogen-summary-plot}
+#| echo: false
+#| warning: false
+#| column: margin
+#| label: fig-pathogen
+#| fig-cap: Distribution of pathogen values
+pact_data |>
+  dplyr::mutate(Pathogen = stringr::str_split(Pathogen, " \\| ")) |>
+  tidyr::unnest(Pathogen) |>
+  dplyr::count(Pathogen) |>
+  ggplot(mapping = aes(x = n, y = reorder(Pathogen, n))) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(x = "Number of Grants (in thousands)", y = "Pathogen") +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx")
+```
+
+```{r pathogen-summary-a}
+#| eval: false
+pact_data |> dplyr::count(Pathogen)
+```
+
+&nbsp;
+
+::: {#tbl-pathogen}
+```{r pathogen-summary-b}
+#| echo: false
+pact_pathogen_table <- pact_data |> dplyr::count()
+
+DT::datatable(
+  pact_pathogen_table, rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Pathogen values
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* there are **`r check_value_na(pact_pathogen_table)`** NA values;
+
+* there are **`r check_value_empty(pact_pathogen_table)`** empty (`""`) values;
+
+* there are **`r check_value_detect(pact_pathogen_table, "Not applicable")`** values of Pathogen that contain "Not applicable" of which **`r check_value_detect(pact_pathogen_table, " Not applicable|Not applicable ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have a Pathogen value and then also be not applicable? If we take not applicable as NA, this will not matter but it is an incoherent record for this variable.
+
+* there are **`r check_value_detect(pact_pathogen_table, "Unspecified")`** values of Pathogen that contain "Unspecified" of which **`r check_value_detect(pact_pathogen_table, " Unspecified|Unspecified ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have a Pathogen value and then also be unspecified?
+:::
+     
+### InfluenzaA {#sec-influenza}
+
+* it would seem that this variable is only relevant if the response/value to Pathogen includes the genus Orthomyxoviridae. To check this:
+
+```{r influenza-check-summary-a}
+#| eval: false
+pact_data |>
+  dplyr::mutate(
+    grouping = stringr::str_detect(Pathogen, pattern = "Orthomyxoviridae")
+  ) |>
+  dplyr::group_by(grouping) |>
+  dplyr::count(InfluenzaA)
+```
+
+&nbsp;
+
+::: {#tbl-influenza}
+```{r influenza-check-summary-b}
+#| echo: false
+pact_influenza_table <- pact_data |>
+  dplyr::mutate(
+    grouping = stringr::str_detect(Pathogen, pattern = "Orthomyxoviridae")
+  ) |>
+  dplyr::group_by(grouping) |>
+  dplyr::count(InfluenzaA)
+
+DT::datatable(
+  pact_influenza_table, rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Influenza A values grouped by Orthomyxoviridae response to pathogen
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* there are **`r check_value_na(pact_influenza_table |> dplyr::filter(grouping) |> dplyr::select(InfluenzaA, n))`** NA values for records that are indicated as "Orthomyxoviridae" in Pathogen;
+
+* there are **`r check_value_empty(pact_influenza_table |> dplyr::filter(grouping) |> dplyr::select(InfluenzaA, n))`** empty (`""`) values for records that are indicated as "Orthomyxoviridae" in Pathogen;
+
+* for records that are indicated as "Orthomyxoviridae" in Pathogen, there are **`r check_value_detect(pact_influenza_table |> dplyr::filter(grouping) |> dplyr::select(InfluenzaA, n), "Not applicable")`** values of InfluenzaA that contain "Not applicable" of which **`r check_value_detect(pact_influenza_table |> dplyr::filter(grouping) |> dplyr::select(InfluenzaA, n), " Not applicable|Not applicable ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have a InfluenzaA value and then also be not applicable?
+
+* for records that are indicated as "Orthomyxoviridae" in Pathogen, there are **`r check_value_detect(pact_influenza_table |> dplyr::filter(grouping) |> dplyr::select(InfluenzaA, n), "Unspecified")`** values of InfluenzaA that contain "Unspecified" of which **`r check_value_detect(pact_influenza_table |> dplyr::filter(grouping) |> dplyr::select(InfluenzaA, n), " Unspecified|Unspecified ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have a InfluenzaA value and then also be unspecified?
+
+* for records that are not "Orthomyxoviridae" response in Pathogen, they have InfluenzaA values of **`r check_value_combo(pact_influenza_table)`**
+:::
+    
+### InfluenzaH1 {#sec-influenza-h1}
+
+::: {.callout-note}
+* it would seem that this variable is only relevant if the response/value to Pathogen includes Orthomyxoviridae and if the response in InfluenzaA includes H1
+
+* with this logic, we expect NAs for records that do not have Orthomyxoviridae in the Pathogens response and no H1 in the InfluenaA response.
+
+* when checking all Pathogens that have Orthomyxoviridae and InfluenzaA that have H1, this seems to map out as expected.
+:::
+
+### Disease {#sec-disease}
+
+```{r disease-summary-plot}
+#| echo: false
+#| warning: false
+#| column: margin
+#| label: fig-disease
+#| fig-cap: Distribution of disease values
+pact_data |>
+  dplyr::mutate(Disease = stringr::str_split(Disease, " \\| ")) |>
+  tidyr::unnest(Disease) |>
+  dplyr::count(Disease) |>
+  ggplot(mapping = aes(x = n, y = reorder(Disease, n))) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(x = "Number of Grants (in thousands)", y = "Disease") +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx")
+```
+
+```{r disease-summary-a}
+#| eval: false
+pact_data |> dplyr::count(Disease)
+```
+
+&nbsp;
+
+::: {#tbl-disease}
+```{r disease-summary-b}
+#| echo: false
+pact_disease_summary_table <- pact_data |> dplyr::count(Disease)
+
+DT::datatable(
+  pact_disease_summary_table, rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Disease values
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* there are **`r check_value_na(pact_disease_summary_table)`** NA values;
+
+* there are **`r check_value_empty(pact_disease_summary_table)`** empty (`""`) values;
+
+* there are **`r check_value_detect(pact_disease_summary_table, "Not applicable")`** values of Disease that contain "Not applicable" of which **`r check_value_detect(pact_disease_summary_table, " Not applicable|Not applicable ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have a Disease value and then also be not applicable? If we take not applicable as NA, this will not matter but it is an incoherent record for this variable.
+
+* there are **`r check_value_detect(pact_disease_summary_table, "Unspecified")`** values of Disease that contain "Unspecified" of which **`r check_value_detect(pact_disease_summary_table, " Unspecified|Unspecified ")`** are one of multiple values for a grant record - this seems incorrect as how can the same grant have a Disease value and then also be unspecified?
+:::
+
+### FundingOrgName {#sec-funder}
+
+```{r funding-org-summary-a}
+#| eval: false
+pact_data |> dplyr::count(FundingOrgName)
+```
+
+&nbsp;
+
+::: {#tbl-funding-org}
+```{r funding-org-summary-b}
+#| echo: false
+pact_funder_table <- pact_data |> dplyr::count(FundingOrgName)
+
+DT::datatable(
+  pact_funder_table, rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Funding organisation values
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* there are **`r check_value_na(pact_funder_table)`** NA values;
+
+* there are **`r check_value_empty(pact_funder_table)`** empty (`""`) values;
+
+* there are **`r check_value_detect(pact_funder_table, "Not applicable")`** values of FunderOrgName that contain "Not applicable"
+
+* there are **`r check_value_detect(pact_funder_table, "Unspecified")`** values of FunderOrgName that contain "Unspecified"
+:::
+
+### Funder Location {#sec-funder-location}
+
+* Funder location information is provided in FunderCountry and FunderRegion. The protocol describes these fields/variables as:
+
+> Funder name and country. The name of the funding organisation and information about their country of affiliation was checked against the CrossRef Open Funder Registry, and then entered in the database. We recorded information on multiple funders if the grant was funded by a joint funding scheme.
+
+> Funder Region. We assigned each funder into one of the six WHO regions based on the funder country. We added international and unspecified values for those that fell outside of these regions.
+
+#### FunderCountry and FunderRegion correspondence {#sec-funder-correspondenc}
+
+* Based on this, we expect that given a country name for a funder, the corresponding WHO region will be provided in the region name. For multiple country locations, the region names should also show corresponding region names.
+
+* From a database perspective, the expectation is that there is a one-to-one correspondence between country name and region name even with multiple responses. 
+
+* to check that there is one-to-one correspondence between FunderCountry and FunderRegion, we detect which rows of data have multiple responses and that the number of responses for FunderCountry is the same as FunderRegion:
+
+```{r detect-country-region-mismatch-a}
+#| eval: false
+pact_data |>
+  dplyr::filter(stringr::str_detect(FunderCountry, pattern = " \\| ")) |>
+  dplyr::select(GrantID, FundingOrgName, FunderCountry, FunderRegion) |>
+  dplyr::mutate(
+    mismatch = pactr:::detect_mismatch(FunderCountry, FunderRegion)
+  )
+```
+
+&nbsp;
+
+::: {#tbl-funder-location-check-1}
+```{r detect-country-region-mismatch-b}
+#| echo: false
+pact_funder_location_mismatch <- pact_data |>
+  dplyr::filter(stringr::str_detect(FunderCountry, pattern = " \\| ")) |>
+  dplyr::select(GrantID, FundingOrgName, FunderCountry, FunderRegion) |>
+  dplyr::mutate(
+    mismatch = pactr:::detect_mismatch(FunderCountry, FunderRegion)
+  )
+
+DT::datatable(
+  pact_funder_location_mismatch, rownames = FALSE, 
+  options = list(paging = FALSE)
+)
+```
+
+Funder country and region mismatches
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* For records that have a mismatch (`mismatch = TRUE`), all the countries in FunderCountry belong to the same region, so the dataset instead just records one value in FunderRegion. This is a non-problematic case for mismatches as there is still correct correspondence for FunderCountry to the appropriate FunderRegion.
+
+* There are records (see record for **grant ID C07971**) where correspondence between country and region is important because the countries belong to different regions. In the example, even without a mismatch, it is not immediately machine-actionable to know which country matches with which region.
+:::
+
+* However, switching our attention to those records that don't have a mismatch:
+
+&nbsp;
+
+::: {#tbl-funder-location-check-2}
+```{r mismatch-false}
+#| echo: false
+DT::datatable(
+  pact_funder_location_mismatch |> dplyr::filter(!mismatch),
+  rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Funder country and region with no mismatches
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+Records for **Grant IDs C07971, C07972, C07973, C07974** show FunderCountry `South Korea | Sweden` with a corresponding FunderRegion of `Europe | Western Pacific`. Again, the values for FunderRegion are correct based on FunderCountry. However, the sequence of the values do not correspond to the sequence for FunderCountry. From a programming point of view, such exceptions to the what the structure of the data should be make the data less machine-actionable. As it is, the data can still be used to report on how many grants based on FunderRegion, and how many grants based on FunderCountry but given the structure, the data will not allow disaggregation by FunderRegion and then further disaggregated by FunderCountry per FunderRegion because of this loss of one-to-one correspondence. Some fixing and cleaning of the data will have to be done by the analyst to make that possible.
+:::
+
+#### FunderCountry and FunderRegion agreement {#sec-funder-agreement}
+
+* A more important check that needs to be routinely done on the location data other than the correspondence mentioned above is whether the classification of a country to the appropriate WHO region is being done correctly.
+
+* For the records above that have more than one country, this is not an issue. The regional classification is correct albeit in some records not in one-to-one correspondence.
+
+* For the rest of the records that only have one FunderCountry, we expect that the FunderRegion will also be a single value and that is the correct WHO regional classification. We check as follows:
+
+```{r check-correct-region-a}
+#| eval: false
+pact_data |>
+  dplyr::filter(
+    stringr::str_detect(FunderCountry, pattern = " \\| ", negate = TRUE)
+  ) |>
+  dplyr::select(GrantID, FundingOrgName, FunderCountry, FunderRegion) |>
+  dplyr::mutate(
+    region_check = pactr:::get_who_regions(FunderCountry),
+    region_correct = FunderRegion == region_check
+  ) |>
+  dplyr::filter(!region_correct) |>
+  dplyr::select(GrantID, FundingOrgName, FunderCountry, FunderRegion)
+```
+
+```{r funder-location-plot-1}
+#| echo: false
+#| eval: false
+#| warning: false
+#| column: margin
+#| label: fig-funder-region
+#| fig-cap: Distribution of funder region values - original values
+pact_data |>
+  dplyr::mutate(
+    FunderRegion = stringr::str_split(FunderRegion, " \\| ")
+  ) |>
+  tidyr::unnest(FunderRegion) |>
+  dplyr::count(FunderRegion) |>
+  ggplot(mapping = aes(x = n, y = reorder(FunderRegion, n))) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(x = "Number of Grants (in thousands)", y = "Funder Region") +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx")
+```
+
+```{r funder-location-plot-2}
+#| echo: false
+#| eval: false
+#| warning: false
+#| column: margin
+#| label: fig-funder-region-corrected
+#| fig-cap: Distribution of funder region values - corrected values
+pact_data_list_cols <- pact_data |>
+  pactr::pact_process_website()
+
+pact_data_list_cols |>
+  pactr::pact_table_location_funder() |>
+  ggplot(mapping = aes(x = n_grants, y = reorder(FunderRegion, n_grants))) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(x = "Number of Grants (in thousands)", y = "Funder Region") +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx")
+```
+
+&nbsp;
+
+::: {#tbl-funder-incorrect-region}
+```{r check-correct-region-b}
+#| echo: false
+pact_correct_funder_region <- pact_data |>
+  dplyr::filter(
+    stringr::str_detect(FunderCountry, pattern = " \\| ", negate = TRUE)
+  ) |>
+  dplyr::select(GrantID, FundingOrgName, FunderCountry, FunderRegion) |>
+  dplyr::mutate(
+    region_check = pactr:::get_who_regions(FunderCountry),
+    region_correct = FunderRegion == region_check
+  ) |>
+  dplyr::filter(!region_correct) |>
+  dplyr::select(GrantID, FundingOrgName, FunderCountry, FunderRegion)
+
+DT::datatable(pact_correct_funder_region, rownames = FALSE)
+```
+
+Records with incorrect funder country and region classification
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* there are **`r nrow(pact_correct_funder_region)`** records with incorrect FunderRegion information.
+:::
+
+### Research Institution Location {#sec-institution-location}
+
+* Research institution location information is provided in ResearchInstitutionCountry and ResearchInstitutionRegion. The protocol describes these fields/variables as:
+
+> Institution name and institution country. We checked the names of all institutions and organisations that were awarded funding against the global standardised list of Research Organisation Registry (ROR)13, and entered the standardised name of the institution. Where no matches were found, for example, if the grant was given to non-research organisations, including private companies, the name was entered as provided in the grant. The country for research institution was assigned from the same global list. Then, the ISO code for the relevant country was recorded in the database.
+
+> Institution region. We used the same approach for research institution, as for funding organisations. We assigned each research institution into one of the six WHO regions based on the institution country.
+
+#### ResearchInstitutionCountry and ResearchInstitutionRegion correspondence {#sec-institution-correspondence}
+
+* Based on this, we expect that given a country name for a research institution, the corresponding WHO region will be provided in the region name. For multiple country locations, the region names should also show corresponding region names.
+
+* From a database perspective, the expectation is that there is a one-to-one correspondence between country name and region name even with multiple responses.
+
+* to check that there is one-to-one correspondence between ResearchInstitutionCountry and ResearchInstitutionRegion, we detect which rows of data have multiple responses and that the number of responses for ResearchInstitutionCountry is the same as ResearchInstitutionRegion:
+
+```{r detect-country-region-mismatch-institution-a}
+#| eval: false
+pact_data |>
+  dplyr::filter(
+    stringr::str_detect(ResearchInstitutionCountry, pattern = " \\| ")
+  ) |>
+  dplyr::select(
+    GrantID, ResearchInstitutionName, ResearchInstitutionCountry, ResearchInstitutionRegion
+  ) |>
+  dplyr::mutate(
+    mismatch = pactr:::detect_mismatch(
+      ResearchInstitutionCountry, ResearchInstitutionRegion
+    )
+  )
+```
+
+&nbsp;
+
+::: {#tbl-institution-location-check-1}
+```{r detect-country-region-mismatch-institution-b}
+#| echo: false
+
+pact_institution_location_mismatch <- pact_data |>
+  dplyr::filter(
+    stringr::str_detect(ResearchInstitutionCountry, pattern = " \\| ")
+  ) |>
+  dplyr::select(
+    GrantID, ResearchInstitutionName, ResearchInstitutionCountry, ResearchInstitutionRegion
+  ) |>
+  dplyr::mutate(
+    mismatch = pactr:::detect_mismatch(
+      ResearchInstitutionCountry, ResearchInstitutionRegion
+    )
+  )
+
+DT::datatable(
+  pact_institution_location_mismatch, rownames = FALSE, 
+  options = list(paging = FALSE)
+)
+```
+
+Research institution country and region mismatches
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* For most of the records shown above, the regional classification is correct but not clear correspondence as to what country belongs to which region.
+
+* Looking in more detail to the table, record with **Grant ID C06207** classify Indonesia as being in the Western Pacific region when in fact it is in the South-East Asia region.
+:::
+
+&nbsp;
+
+* Switching our attention to those records that don't have a mismatch:
+
+&nbsp;
+
+::: {#tbl-institution-location-check-2}
+```{r mismatch-false-institution}
+#| echo: false
+DT::datatable(
+  pact_institution_location_mismatch |> dplyr::filter(!mismatch),
+  rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Research institution country and region with no mismatches
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* Both records with no mismatch have the right regions but not machine-actionable as it is unclear which region matches which country.
+:::
+
+#### ResearchInstitutionCountry and ResearchInstitutionRegion agreement {#sec-institution-agreement}
+
+* A more important check that needs to be routinely done on the location data other than the correspondence mentioned above is whether the classification of a country to the appropriate WHO region is being made.
+
+* For the records above that have more than one country, this is not an issue. The regional classification is correct albeit in some records not in one-to-one correspondence.
+
+* For the rest of the records that only have one ResearchInstitutionCountry, we expect that the ResearchInstitutionRegion will also be a single value and that it is the correct WHO regional classification. We check as follows:
+
+```{r check-correct-region-institution-a}
+#| eval: false
+pact_data |>
+  dplyr::filter(
+    stringr::str_detect(
+      ResearchInstitutionCountry, pattern = " \\| ", negate = TRUE
+    )
+  ) |>
+  dplyr::select(
+    GrantID, ResearchInstitutionName, 
+    ResearchInstitutionCountry, ResearchInstitutionRegion
+  ) |>
+  dplyr::mutate(
+    region_check = pactr:::get_who_regions(ResearchInstitutionCountry),
+    region_correct = ResearchInstitutionRegion == region_check
+  ) |>
+  dplyr::filter(!region_correct) |>
+  dplyr::select(
+    GrantID, ResearchInstitutionName, 
+    ResearchInstitutionCountry, 
+    ResearchInstitutionRegion
+  )
+```
+
+```{r institution-location-plot-1}
+#| echo: false
+#| eval: false
+#| warning: false
+#| column: margin
+#| label: fig-institution-region
+#| fig-cap: Distribution of research institution region values - original values
+pact_data |>
+  dplyr::mutate(
+    ResearchInstitutionRegion = stringr::str_split(
+      ResearchInstitutionRegion, " \\| ")
+  ) |>
+  tidyr::unnest(ResearchInstitutionRegion) |>
+  dplyr::count(ResearchInstitutionRegion) |>
+  ggplot(mapping = aes(x = n, y = reorder(ResearchInstitutionRegion, n))) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(x = "Number of Grants (in thousands)", y = "Research Institution Region") +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx")
+```
+
+```{r institution-location-plot-2}
+#| echo: false
+#| eval: false
+#| warning: false
+#| column: margin
+#| label: fig-institution-region-corrected
+#| fig-cap: Distribution of research institution region values - corrected values
+pact_data_list_cols |>
+  pactr::pact_table_location_institution() |>
+  ggplot(
+    mapping = aes(
+      x = n_grants, y = reorder(ResearchInstitutionRegion, n_grants)
+    )
+  ) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(
+    x = "Number of Grants (in thousands)", y = "Research Institution Region"
+  ) +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx")
+```
+
+&nbsp;
+
+::: {#tbl-institution-incorrect-region}
+```{r check-correct-region-institution-b}
+#| echo: false
+pact_correct_institution_region <- pact_data |>
+  dplyr::filter(
+    stringr::str_detect(
+      ResearchInstitutionCountry, pattern = " \\| ", negate = TRUE
+    )
+  ) |>
+  dplyr::select(
+    GrantID, ResearchInstitutionName, 
+    ResearchInstitutionCountry, ResearchInstitutionRegion
+  ) |>
+  dplyr::mutate(
+    region_check = pactr:::get_who_regions(ResearchInstitutionCountry),
+    region_correct = ResearchInstitutionRegion == region_check
+  ) |>
+  dplyr::filter(!region_correct) |>
+  dplyr::select(
+    GrantID, ResearchInstitutionName, 
+    ResearchInstitutionCountry, 
+    ResearchInstitutionRegion
+  )
+
+DT::datatable(pact_correct_institution_region, rownames = FALSE)
+```
+
+Records with incorrect institution country and institution region classification
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* there are **`r nrow(pact_correct_institution_region)`** incorrect WHO regional classification based on ResearchInstitutionCountry
+:::
+
+### Research Location {#sec-research-location}
+
+* Research location information is provided in ResearchLocationCountry and ResearchLoationRegion. The protocol describes these fields/variables as:
+
+> Research Location Country and Region. We entered information where the research activities are taking place if information about the country, or a specific location, was different from the location of the research institution, and was provided in the grant abstract. Multiple locations were permitted, and relevant ISO codes for countries were used. The countries were then grouped into the six WHO regions. In no additional information on the research location was available, we used that of the research institution.
+
+#### ResearchLocationCountry and ResearchLocationRegion correspondence {#sec-research-correspondence}
+
+* Based on this, we expect that given a country name for a research institution, the corresponding WHO region will be provided in the region name. For multiple country locations, the region names should also show corresponding region names.
+
+* From a database perspective, the expectation is that there is a one-to-one correspondence between country name and region name even with multiple responses.
+
+* to check that there is one-to-one correspondence between ResearchInstitutionCountry and ResearchInstitutionRegion, we detect which rows of data have multiple responses and that the number of responses for ResearchInstitutionCountry is the same as ResearchInstitutionRegion:
+
+```{r detect-country-region-mismatch-research-a}
+#| eval: false
+pact_data |>
+  dplyr::filter(
+    stringr::str_detect(ResearchLocationCountry, pattern = " \\| ")
+  ) |>
+  dplyr::select(
+    GrantID, 
+    ResearchLocationCountry, 
+    ResearchLocationRegion
+  ) |>
+  dplyr::mutate(
+    mismatch = pactr:::detect_mismatch(
+      ResearchLocationCountry, ResearchLocationRegion
+    )
+  )
+```
+
+&nbsp;
+
+:::{#tbl-research-location-check-1}
+```{r detect-country-region-mismatch-research-b}
+#| echo: false
+pact_research_location_mismatch <- pact_data |>
+  dplyr::filter(
+    stringr::str_detect(ResearchLocationCountry, pattern = " \\| ")
+  ) |>
+  dplyr::select(
+    GrantID, 
+    ResearchLocationCountry, 
+    ResearchLocationRegion
+  ) |>
+  dplyr::mutate(
+    mismatch = pactr:::detect_mismatch(
+      ResearchLocationCountry, ResearchLocationRegion
+    )
+  )
+
+DT::datatable(
+  pact_research_location_mismatch, rownames = FALSE, 
+  options = list(paging = FALSE)
+)
+```
+
+Research location country and region mismatches
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* For mismatches, it's mainly the region not having one-to-one correspondence with the country.
+
+* The record for **Grant ID C00038**, country shows multiple locations one of which is Egypt, but in region, there is no Eastern Mediterranean where Egypt is classified.
+:::
+
+&nbsp;
+
+* Switching our attention to those records that don't have a mismatch:
+
+&nbsp;
+
+::: {#tbl-research-location-check-2}
+```{r mismatch-false-research}
+#| echo: false
+DT::datatable(
+  pact_research_location_mismatch |> dplyr::filter(!mismatch),
+  rownames = FALSE, options = list(paging = FALSE)
+)
+```
+
+Research location country and region with no mismatches
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* Both records with no mismatch have the right regions but not in the right order.
+:::
+
+#### ResearchLocationCountry and ResearchLocationRegion agreement {#sec-research-agreement}
+
+* A more important check that needs to be routinely done on the location data other than the correspondence mentioned above is whether the classification of a country to the appropriate WHO region is being made.
+
+* For the records above that have more than one country, this is not an issue. The regional classification is correct albeit in some records not in one-to-one correspondence.
+
+* For the rest of the records that only have one ResearchInstitutionCountry, we expect that the ResearchInstitutionRegion will also be a single value and that it is the correct WHO regional classification. We check as follows:
+
+```{r check-correct-region-research-a}
+#| eval: false
+pact_data |>
+  dplyr::filter(
+    stringr::str_detect(
+      ResearchLocationCountry, pattern = " \\| ", negate = TRUE
+    )
+  ) |>
+  dplyr::select(
+    GrantID,
+    ResearchLocationCountry, 
+    ResearchLocationRegion
+  ) |>
+  dplyr::mutate(
+    region_check = pactr:::get_who_regions(ResearchLocationCountry),
+    region_correct = ResearchLocationRegion == region_check
+  ) |>
+  dplyr::filter(!region_correct) |>
+  dplyr::select(
+    GrantID, 
+    ResearchLocationCountry, 
+    ResearchLocationRegion
+  )
+```
+
+```{r research-location-plot-1}
+#| echo: false
+#| eval: false
+#| warning: false
+#| column: margin
+#| label: fig-research-region
+#| fig-cap: Distribution of research location region values - original values
+pact_data |>
+  dplyr::mutate(
+    ResearchLocationRegion = stringr::str_split(
+      ResearchLocationRegion, " \\| ")
+  ) |>
+  tidyr::unnest(ResearchLocationRegion) |>
+  dplyr::count(ResearchLocationRegion) |>
+  ggplot(mapping = aes(x = n, y = reorder(ResearchLocationRegion, n))) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(x = "Number of Grants (in thousands)", y = "Research Location Region") +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx")
+```
+
+```{r research-location-plot-2}
+#| echo: false
+#| eval: false
+#| warning: false
+#| column: margin
+#| label: fig-research-region-corrected
+#| fig-cap: Distribution of research location region values - corrected values
+pact_data_list_cols |>
+  pactr::pact_table_location_research() |>
+  ggplot(
+    mapping = aes(x = n_grants, y = reorder(ResearchLocationRegion, n_grants))
+  ) +
+  geom_col(
+    colour = get_oxford_colour("sky"),
+    fill = get_oxford_colour("sky"),
+    alpha = 0.7
+  ) +
+  labs(x = "Number of Grants (in thousands)", y = "Research Location Region") +
+  scale_x_continuous(
+    breaks = scales::breaks_pretty(),
+    labels = scales::label_number(scale = 1e-3)
+  ) +
+  theme_oxford(grid = "Xx")
+```
+
+&nbsp;
+
+::: {#tbl-research-incorrect-region}
+```{r check-correct-region-research-b}
+#| echo: false
+pact_correct_research_region <- pact_data |>
+  dplyr::filter(
+    stringr::str_detect(
+      ResearchLocationCountry, pattern = " \\| ", negate = TRUE
+    )
+  ) |>
+  dplyr::select(
+    GrantID, 
+    ResearchLocationCountry, 
+    ResearchLocationRegion
+  ) |>
+  dplyr::mutate(
+    region_check = pactr:::get_who_regions(ResearchLocationCountry),
+    region_correct = ResearchLocationRegion == region_check
+  ) |>
+  dplyr::filter(!region_correct) |>
+  dplyr::select(
+    GrantID, 
+    ResearchLocationCountry, 
+    ResearchLocationRegion
+  )
+
+DT::datatable(pact_correct_research_region, rownames = FALSE)
+```
+
+Records with incorrect research location country and institution region classification
+
+:::
+
+&nbsp;
+
+::: {.callout-note}
+* There are **`r nrow(pact_correct_research_region)`** records that have misclassified ResearchLocationRegion based on their ResearchLocationCountry.
+:::

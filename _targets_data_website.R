@@ -54,5 +54,41 @@ process_website_targets <- tar_plan(
       pact_data_list_cols, topic = "ResearchSubcat",
       na_values = "No subcategory"
     )
+  ),
+  tar_target(
+    name = pact_region_funder_table,
+    command = pact_table_location_funder(
+      pact_data_list_cols, topic = "FunderRegion"
+    )
+  ),
+  tar_target(
+    name = pact_country_funder_table,
+    command = pact_table_location_funder(
+      pact_data_list_cols, topic = "FunderCountry"
+    )
+  ),
+  tar_target(
+    name = pact_region_institution_table,
+    command = pact_table_location_institution(
+      pact_data_list_cols, topic = "ResearchInstitutionRegion"
+    )
+  ),
+  tar_target(
+    name = pact_country_institution_table,
+    command = pact_table_location_institution(
+      pact_data_list_cols, topic = "ResearchInstitutionCountry"
+    )
+  ),
+  tar_target(
+    name = pact_region_research_table,
+    command = pact_table_location_research(
+      pact_data_list_cols, topic = "ResearchLocationRegion"
+    )
+  ),
+  tar_target(
+    name = pact_country_research_table,
+    command = pact_table_location_research(
+      pact_data_list_cols, topic = "ResearchLocationCountry"
+    )
   )
 )
